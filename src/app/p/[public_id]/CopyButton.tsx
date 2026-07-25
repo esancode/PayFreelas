@@ -12,44 +12,36 @@ export function CopyButton({ textToCopy, label = 'Copiar' }: { textToCopy: strin
     
     if (!textToCopy) return
 
-    const fallbackCopyTextToClipboard = (text: string) => {
-      const textArea = document.createElement("textarea")
-      textArea.value = text
-      
-      // Evitar scroll
-      textArea.style.top = "0"
-      textArea.style.left = "0"
-      textArea.style.position = "fixed"
-
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-
-      try {
-        const successful = document.execCommand('copy')
-        if (successful) {
+    // Safest approach for mobile (iOS/Android):
+    // 1. Only use navigator.clipboard if it exists.
+    // 2. Do not use textarea/execCommand hacks asynchronously as they can crash WebViews.
+    if (typeof navigator !== 'undefined' && navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
           setCopied(true)
           setTimeout(() => setCopied(false), 2000)
-        }
+        })
+        .catch(err => {
+          console.error('Falha na cópia nativa:', err)
+        })
+    } else {
+      // Very simple synchronous fallback if clipboard API is not available
+      try {
+        const textArea = document.createElement("textarea")
+        textArea.value = textToCopy
+        textArea.style.position = "fixed"
+        textArea.style.opacity = "0"
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
       } catch (err) {
-        console.error('Fallback: Oops, não foi possível copiar', err)
+        console.error('Falha no fallback:', err)
       }
-
-      document.body.removeChild(textArea)
     }
-
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(textToCopy)
-      return
-    }
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }).catch(err => {
-      console.error('Falha ao copiar:', err)
-      fallbackCopyTextToClipboard(textToCopy)
-    })
   }
 
   if (!textToCopy) return null
