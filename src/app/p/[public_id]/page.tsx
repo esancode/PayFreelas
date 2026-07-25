@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { formatCurrency } from '@/utils/format'
 import { CreditCard, Landmark, QrCode, FileText, Calendar, MessageCircle } from 'lucide-react'
 import { MercadoPagoCheckout } from './MercadoPagoCheckout'
+import { CopyButton } from './CopyButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,11 +115,16 @@ export default async function PublicProjectPage({ params }: { params: Promise<{ 
                   <p className="text-sm text-gray-500">Pagamento instantâneo via chave Pix</p>
                 </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-2">Chave Pix:</p>
-                <p className="font-mono font-medium text-gray-900 break-all select-all">
-                  {config?.chave_pix || 'Chave não configurada pelo administrador'}
-                </p>
+              <div className="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Chave Pix:</p>
+                  <p className="font-mono font-medium text-gray-900 break-all select-all">
+                    {config?.chave_pix || 'Chave não configurada pelo administrador'}
+                  </p>
+                </div>
+                {config?.chave_pix && (
+                  <CopyButton textToCopy={config.chave_pix} label="Copiar Chave" />
+                )}
               </div>
             </div>
 
@@ -133,10 +139,13 @@ export default async function PublicProjectPage({ params }: { params: Promise<{ 
                   <p className="text-sm text-gray-500">Depósito direto na conta</p>
                 </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium text-gray-900 whitespace-pre-wrap">
+              <div className="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
+                <p className="font-medium text-gray-900 whitespace-pre-wrap flex-1">
                   {config?.dados_deposito || 'Dados bancários não configurados'}
                 </p>
+                {config?.dados_deposito && (
+                  <CopyButton textToCopy={config.dados_deposito} label="Copiar Dados" />
+                )}
               </div>
             </div>
 
@@ -190,7 +199,7 @@ export default async function PublicProjectPage({ params }: { params: Promise<{ 
               href={`https://wa.me/${config.whatsapp.replace(/\D/g, '')}`} 
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-emerald-600 bg-emerald-50 px-6 py-3 rounded-full font-medium hover:bg-emerald-100 transition-colors"
+              className="inline-flex items-center gap-2 text-emerald-600 bg-emerald-50 px-6 py-3 rounded-full font-medium hover:bg-emerald-100 transition-colors cursor-pointer"
             >
               <MessageCircle className="w-5 h-5" />
               Falar com o responsável

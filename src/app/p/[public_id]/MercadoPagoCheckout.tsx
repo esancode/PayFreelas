@@ -53,7 +53,7 @@ export function MercadoPagoCheckout({ publicId, maxAmount }: { publicId: string,
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="w-full text-left bg-white p-6 rounded-2xl border border-gray-200 hover:border-gray-900 transition-colors shadow-sm relative overflow-hidden group"
+        className="w-full text-left bg-white p-6 rounded-2xl border border-gray-200 hover:border-gray-900 transition-colors shadow-sm relative overflow-hidden group cursor-pointer"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
