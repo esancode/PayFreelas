@@ -6,15 +6,50 @@ import { Copy, Check } from 'lucide-react'
 export function CopyButton({ textToCopy, label = 'Copiar' }: { textToCopy: string, label?: string }) {
   const [copied, setCopied] = useState(false)
 
-  async function handleCopy() {
+  function handleCopy(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    
     if (!textToCopy) return
-    try {
-      await navigator.clipboard.writeText(textToCopy)
+
+    const fallbackCopyTextToClipboard = (text: string) => {
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      
+      // Evitar scroll
+      textArea.style.top = "0"
+      textArea.style.left = "0"
+      textArea.style.position = "fixed"
+
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+
+      try {
+        const successful = document.execCommand('copy')
+        if (successful) {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 2000)
+        }
+      } catch (err) {
+        console.error('Fallback: Oops, não foi possível copiar', err)
+      }
+
+      document.body.removeChild(textArea)
+    }
+
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(textToCopy)
+      return
+    }
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    }).catch(err => {
       console.error('Falha ao copiar:', err)
-    }
+      fallbackCopyTextToClipboard(textToCopy)
+    })
   }
 
   if (!textToCopy) return null
